@@ -304,7 +304,7 @@ void CKFloatRandomFloatFloat(CKContext *context, CKParameterOut *res, CKParamete
     float minVal2 = ReadFloat(p1);  // Re-read p1 as per original binary
 
     // rand() scaled to [0, 1) then mapped to [min, max]
-    // Original constant: 0.000030518499 ≈ 1.0 / 32768.0
+    // Original constant: 0.000030518499 (approx 1.0 / 32768.0)
     float randNorm = (float)rand() * 3.0518499e-05f;
     float result = minVal + randNorm * (maxVal - minVal2);
 
@@ -490,7 +490,7 @@ void CKFloatSetInt(CKContext *context, CKParameterOut *res, CKParameterIn *p1, C
 void CKFloatDegreToRadianFloat(CKContext *context, CKParameterOut *res, CKParameterIn *p1, CKParameterIn *p2)
 {
     float val = ReadFloat(p1);
-    // Original constant: 0.017453292 ≈ PI/180
+    // Original constant: 0.017453292 (approx PI/180)
     *(float *)res->GetWriteDataPtr() = val * 0.017453292f;
 }
 
@@ -500,7 +500,7 @@ void CKFloatDegreToRadianFloat(CKContext *context, CKParameterOut *res, CKParame
 void CKFloatRadianToDegreFloat(CKContext *context, CKParameterOut *res, CKParameterIn *p1, CKParameterIn *p2)
 {
     float val = ReadFloat(p1);
-    // Original constant: 57.295776 ≈ 180/PI
+    // Original constant: 57.295776 (approx 180/PI)
     *(float *)res->GetWriteDataPtr() = val * 57.295776f;
 }
 
@@ -3109,7 +3109,7 @@ void CKVectorNormalizeVector(CKContext *context, CKParameterOut *res, CKParamete
 
 // Original symbol: ?CKVectorReflectVectorVector@@YAXPAVCKContext@@PAVCKParameterOut@@PAVCKParameterIn@@2@Z
 // opfunc_ea=0x24B48F50
-// Reflects a vector across a normal: R = 2*(N·(-V))*N - (-V)
+// Reflects a vector across a normal: R = 2*(N dot (-V))*N - (-V)
 void CKVectorReflectVectorVector(CKContext *context, CKParameterOut *res, CKParameterIn *p1, CKParameterIn *p2)
 {
     VxVector incident(0, 0, 0);
@@ -3136,7 +3136,7 @@ void CKVectorReflectVectorVector(CKContext *context, CKParameterOut *res, CKPara
     // Normalize the normal
     normal.Normalize();
 
-    // Compute reflection: R = 2*(N·(-V))*N - (-V) = 2*(N·(-V))*N + V
+    // Compute reflection: R = 2*(N dot (-V))*N - (-V) = 2*(N dot (-V))*N + V
     float dot = normal.x * negIncident.x + normal.y * negIncident.y + normal.z * negIncident.z;
     float twoTimeDot = dot + dot;
 
@@ -4917,7 +4917,7 @@ void CKStringAddStringString(CKContext *context, CKParameterOut *res, CKParamete
 
     s1 << s2;
 
-    res->SetValue((void *)s1.CStr(), s1.Length() + 1);
+    res->SetValue(s1.CStr(), s1.Length() + 1);
 }
 
 // Original symbol: ?CKStringSetGeneric@@YAXPAVCKContext@@PAVCKParameterOut@@PAVCKParameterIn@@2@Z
@@ -4950,11 +4950,11 @@ void CKStringGetNameObject(CKContext *context, CKParameterOut *res, CKParameterI
     if (obj && obj->GetName())
     {
         const char *name = obj->GetName();
-        res->SetValue((void *)name, strlen(name) + 1);
+        res->SetValue(name, strlen(name) + 1);
     }
     else
     {
-        res->SetValue((void *)"", 1);
+        res->SetValue("", 1);
     }
 }
 
@@ -4968,7 +4968,7 @@ void CKStringGetTextSpriteText(CKContext *context, CKParameterOut *res, CKParame
     {
         const char *text = spriteText->GetText();
         if (text)
-            res->SetValue((void *)text, strlen(text));
+            res->SetValue(text, strlen(text));
     }
 }
 
@@ -6977,7 +6977,12 @@ void CKGenericEqual1Dword(CKContext *context, CKParameterOut *res, CKParameterIn
     
     CKParameter *src2 = GetSourceParameter(p2);
     CKDWORD *d2 = src2 ? (CKDWORD *)src2->GetReadDataPtr(TRUE) : NULL;
-    
+
+    if (!d1 || !d2) {
+        *(CKBOOL *)res->GetWriteDataPtr() = (d1 == d2) ? TRUE : FALSE;
+        return;
+    }
+
     *(CKBOOL *)res->GetWriteDataPtr() = (*d1 == *d2);
 }
 
@@ -6991,7 +6996,12 @@ void CKGenericNotEqual1Dword(CKContext *context, CKParameterOut *res, CKParamete
     
     CKParameter *src2 = GetSourceParameter(p2);
     CKDWORD *d2 = src2 ? (CKDWORD *)src2->GetReadDataPtr(TRUE) : NULL;
-    
+
+    if (!d1 || !d2) {
+        *(CKBOOL *)res->GetWriteDataPtr() = (d1 == d2) ? FALSE : TRUE;
+        return;
+    }
+
     *(CKBOOL *)res->GetWriteDataPtr() = (*d1 != *d2);
 }
 
@@ -7005,7 +7015,12 @@ void CKGenericEqual2Dword(CKContext *context, CKParameterOut *res, CKParameterIn
     
     CKParameter *src2 = GetSourceParameter(p2);
     void *d2 = src2 ? src2->GetReadDataPtr(TRUE) : NULL;
-    
+
+    if (!d1 || !d2) {
+        *(CKBOOL *)res->GetWriteDataPtr() = (d1 == d2) ? TRUE : FALSE;
+        return;
+    }
+
     *(CKBOOL *)res->GetWriteDataPtr() = (memcmp(d1, d2, 8) == 0);
 }
 
