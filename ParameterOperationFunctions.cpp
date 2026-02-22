@@ -4950,7 +4950,7 @@ void CKStringGetNameObject(CKContext *context, CKParameterOut *res, CKParameterI
     if (obj && obj->GetName())
     {
         const char *name = obj->GetName();
-        res->SetValue(name, strlen(name) + 1);
+        res->SetValue(name, (int)strlen(name) + 1);
     }
     else
     {
@@ -4968,7 +4968,7 @@ void CKStringGetTextSpriteText(CKContext *context, CKParameterOut *res, CKParame
     {
         const char *text = spriteText->GetText();
         if (text)
-            res->SetValue(text, strlen(text));
+            res->SetValue(text, (int)strlen(text));
     }
 }
 
